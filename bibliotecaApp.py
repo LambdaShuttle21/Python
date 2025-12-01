@@ -1,37 +1,5 @@
 
-# listado general 30 libros
-biblioteca_general = [
-    {"titulo": "El Hobbit", "autor": "Tolkien", "paginas": 300, "genero": "Fantasía"},
-    {"titulo": "1984", "autor": "Orwell", "paginas": 250, "genero": "Distopía"},
-    {"titulo": "Dune", "autor": "Herbert", "paginas": 500, "genero": "Ciencia ficción"},
-    {"titulo": "It", "autor": "Stephen King", "paginas": 600, "genero": "Terror"},
-    {"titulo": "Fundación", "autor": "Asimov", "paginas": 230, "genero": "Ciencia ficción"},
-    {"titulo": "Neuromante", "autor": "William Gibson", "paginas": 280, "genero": "Ciencia ficción"},
-    {"titulo": "El Juego de Ender", "autor": "Orson Scott Card", "paginas": 320, "genero": "Ciencia ficción"},
-    {"titulo": "La Llamada de Cthulhu", "autor": "H.P. Lovecraft", "paginas": 140, "genero": "Terror"},
-    {"titulo": "Drácula", "autor": "Bram Stoker", "paginas": 400, "genero": "Terror"},
-    {"titulo": "Frankenstein", "autor": "Mary Shelley", "paginas": 230, "genero": "Terror"},
-    {"titulo": "El Principito", "autor": "Antoine de Saint-Exupéry", "paginas": 100, "genero": "Fábula"},
-    {"titulo": "Crimen y castigo", "autor": "Dostoievski", "paginas": 430, "genero": "Drama"},
-    {"titulo": "Rayuela", "autor": "Julio Cortázar", "paginas": 600, "genero": "Novela"},
-    {"titulo": "Cien años de soledad", "autor": "Gabriel García Márquez", "paginas": 470, "genero": "Realismo mágico"},
-    {"titulo": "Don Quijote", "autor": "Cervantes", "paginas": 1000, "genero": "Clásico"},
-    {"titulo": "La Sombra del Viento", "autor": "Carlos Ruiz Zafón", "paginas": 520, "genero": "Misterio"},
-    {"titulo": "El Código Da Vinci", "autor": "Dan Brown", "paginas": 450, "genero": "Thriller"},
-    {"titulo": "Los Juegos del Hambre", "autor": "Suzanne Collins", "paginas": 370, "genero": "Distopía"},
-    {"titulo": "Harry Potter 1", "autor": "J.K. Rowling", "paginas": 350, "genero": "Fantasía"},
-    {"titulo": "Harry Potter 2", "autor": "J.K. Rowling", "paginas": 370, "genero": "Fantasía"},
-    {"titulo": "Harry Potter 3", "autor": "J.K. Rowling", "paginas": 430, "genero": "Fantasía"},
-    {"titulo": "La Metamorfosis", "autor": "Kafka", "paginas": 120, "genero": "Absurdismo"},
-    {"titulo": "El Nombre del Viento", "autor": "Patrick Rothfuss", "paginas": 700, "genero": "Fantasía"},
-    {"titulo": "El Temor de un Hombre Sabio", "autor": "Patrick Rothfuss", "paginas": 1100, "genero": "Fantasía"},
-    {"titulo": "El Señor de los Anillos 1", "autor": "Tolkien", "paginas": 500, "genero": "Fantasía"},
-    {"titulo": "El Señor de los Anillos 2", "autor": "Tolkien", "paginas": 450, "genero": "Fantasía"},
-    {"titulo": "El Señor de los Anillos 3", "autor": "Tolkien", "paginas": 550, "genero": "Fantasía"},
-    {"titulo": "Solaris", "autor": "Stanislaw Lem", "paginas": 300, "genero": "Ciencia ficción"},
-    {"titulo": "El Perfume", "autor": "Patrick Süskind", "paginas": 280, "genero": "Drama"},
-    {"titulo": "El Alquimista", "autor": "Paulo Coelho", "paginas": 210, "genero": "Fábula"}
-]
+from typing import Dict, Any, List
 
 
 # ============================================
@@ -151,8 +119,7 @@ def info_libro(biblioteca: Dict[str, Dict[str, Any]], titulo: str) -> None:
     """
     #SI LO QUE TE DOY COMO ARGS (titulo) EXISTE COMO CLAVE EN biblioteca, entonces...
     if titulo in biblioteca:
-        libro = biblioteca[titulo]#Me devuelve el diccionario que pertenece a la clave, es decir al titulo
-        #una vez tenga el valor (el diccionario) lo recorro
+        libro = biblioteca[titulo]#Dame el diccionario interno que corresponde a la clave titulo
         print("Informacion del libro: ")
         for clave, valor in libro.items():
             print(f"{clave}: {valor}")
@@ -219,18 +186,15 @@ def buscar_libro_global(sistema, titulo):
             if libroTitulo == titulo:
                 return titulo, nombreBiblioteca
 
-
+# EJERCICIO 6
 def buscar_autor_global(sistema, autor):
-    """
-    TODO: devolver todos los libros de un autor en todas las bibliotecas.
-    """
     res = []
-    for nombreBiblioteca, biblioteca in sistema.items():
-        for libroTitulo, libro in biblioteca.items():
-            for libroAutor, info in libro.items():
-                if libroAutor["autor"] == autor:
-                    res.append(libro)
-    return res                 
+    for bibliotecaNombre, biblioteca in sistema.items():       # nivel 1: bibliotecas
+        for libroTitulo, libro in biblioteca.items():     # nivel 2: libros
+            if libro.get("autor") == autor:     # nivel 3: acceso directo
+                res.append(libro)
+    return res
+                 
 
 
 # ============================================
@@ -238,11 +202,12 @@ def buscar_autor_global(sistema, autor):
 # ============================================
 
 def menu_principal():
-    
+    sistema = {}  # inicializamos vacío
+
     while True:
         print("\n===== GESTIÓN DE BIBLIOTECA =====")
         print("1. Crear libro")
-        print("2. Buscar libros por autor")
+        print("2. Buscar libros por autor (en una biblioteca)")
         print("3. Mostrar información detallada de un libro")
         print("4. Crear sistema de bibliotecas")
         print("5. Buscar libro en todas las bibliotecas")
@@ -253,27 +218,62 @@ def menu_principal():
 
         if opcion == "1":
             print("OPCIÓN 1: Crear libro")
-            # TODO: pedir datos al usuario y llamar a crear_libro()
+            titulo = input("Título: ")
+            autor = input("Autor: ")
+            paginas = int(input("Número de páginas: "))
+            genero = input("Género (o deja vacío): ")
+            if genero.strip() == "":
+                genero = None
+            nuevo_libro = crear_libro(titulo, autor, paginas, genero)
+            print("Libro creado:", nuevo_libro)
 
         elif opcion == "2":
             print("OPCIÓN 2: Buscar libros por autor")
-            # TODO:
+            autor = input("Autor a buscar: ")
+            biblioteca = [libro1, libro2, libro3, libro4, libro5]  # ejemplo con biblioteca1
+            resultado = buscar_por_autor(biblioteca, autor)
+            if resultado:
+                print("Libros encontrados:")
+                for libro in resultado:
+                    print(libro)
+            else:
+                print("Autor no encontrado")
 
         elif opcion == "3":
             print("OPCIÓN 3: Información detallada de libro")
-            # TODO: 
+            titulo = input("Título del libro: ")
+            info_libro(biblioteca_dict, titulo)
 
         elif opcion == "4":
             print("OPCIÓN 4: Crear sistema de bibliotecas")
-            # TODO: 
+            sistema = crear_sistema_bibliotecas()
+            print("Sistema creado correctamente.")
 
         elif opcion == "5":
             print("OPCIÓN 5: Búsqueda global de libro")
-            # TODO
+            if not sistema:
+                print("Primero debes crear el sistema (opción 4).")
+            else:
+                titulo = input("Título del libro: ")
+                resultado = buscar_libro_global(sistema, titulo)
+                if resultado:
+                    print(f"El libro '{resultado[0]}' está en la biblioteca '{resultado[1]}'.")
+                else:
+                    print("Libro no encontrado en el sistema.")
 
         elif opcion == "6":
             print("OPCIÓN 6: Búsqueda global de autor")
-            # TODO
+            if not sistema:
+                print("Primero debes crear el sistema (opción 4).")
+            else:
+                autor = input("Autor a buscar: ")
+                resultado = buscar_autor_global(sistema, autor)
+                if resultado:
+                    print("Libros encontrados:")
+                    for libro in resultado:
+                        print(libro)
+                else:
+                    print("Autor no encontrado en el sistema.")
 
         elif opcion == "0":
             print("Saliendo del programa...")
@@ -281,6 +281,7 @@ def menu_principal():
 
         else:
             print("Opción no válida. Intente de nuevo.")
+
 
 
 # EJECUTAR MENÚ
