@@ -14,7 +14,8 @@ def conexion():
         while True:#empieza a escuchar...
             conn, addr = server_socket.accept()#conn = el socket especifico para hablar con ese cliente #addr = direccion del cliente, IP y puerto
             print(f"Conectado con {addr}")
-            hilo = threading.Thread(target=game, args=(conn, addr))
+            hilo = threading.Thread(target=game, args=(conn, addr))#Creas un hilo para el juego de adivinar al que le pasas el enchufe (metodos de socket)
+            #y la direccion IP con el puerto del cliente
             hilo.start()
     except socket.error as e:
         print(e)
