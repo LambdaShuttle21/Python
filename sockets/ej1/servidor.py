@@ -23,20 +23,21 @@ def conexion():
         server_socket.close()
 
 def game(conn, addr):
-    random_num = random.randint(1, 10)
+    random_num = random.randint(1, 10)#cada cliente tiene su propia partida (hilo)
     while True:
         print("Ingresa un numero del 1 al 10: ")
-        data = conn.recv(1024)
-        num = data.decode()
-        if (int(num) == random_num):
+        data = conn.recv(1024)#recibe hasta 1024 bytes del socket del cliente 
+        num = data.decode()#decodifica esos bytes a string y para compararlos con random, hacemos un cast a de string a int
+        if (int(num) == random_num):#si acierta...
             print(f"Has acertado, el numero era {random_num}")
-            conn.sendall(b"0")
+            conn.sendall(b"0")#se envia "0" al cliente y se rompe el bucle
             break
-        elif (int(num) < random_num):
+        elif (int(num) < random_num):#si es mayor se le envia 1 
             print("El numero es mayor")
             conn.sendall(b"1")
-        else:
+        else:#si es menor se le envia -1
             print("El numero es menor")
             conn.sendall(b"-1")
 
+#El servidor puede tener varios clientes jugando a la vez, cada uno en su hilo game
 conexion()
